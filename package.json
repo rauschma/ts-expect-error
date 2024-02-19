@@ -1,0 +1,24 @@
+{
+  "name": "@rauschma/expect-error",
+  "version": "1.0.0",
+  "author": "Axel Rauschmayer",
+  "type": "module",
+  "bin": {
+    "expect-error": "dist/src/expect-error.js"
+  },
+  "scripts": {
+    "build": "npm run clean && tsc && npm run chmod",
+    "watch": "tsc --watch",
+    "clean": "shx rm -rf ./dist/*",
+    "chmod": "chmod u+x ./dist/src/expect-error.js",
+    "test": "node --test --enable-source-maps",
+    "testall": "node --test --enable-source-maps \"./dist/**/*_test.js\""
+  },
+  "license": "MIT",
+  "dependencies": {
+    "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.19"
+  }
+}
