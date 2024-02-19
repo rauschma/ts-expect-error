@@ -1,9 +1,10 @@
 import ts from 'typescript';
 import { normalizeWhitespace, removeSuffix } from '../util/strings.js';
+import type { DiagnosticInfo } from './diagnostic-lookup.js';
 
 const RE_ERROR_CODE = /\s*\(([0-9]+)\)$/u;
 export class MessageAndCode {
-  static fromDiagnostic(diagnostic: ts.Diagnostic): MessageAndCode {
+  static fromDiagnostic(diagnostic: DiagnosticInfo): MessageAndCode {
     const actualMessage = normalizeWhitespace(ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'));
     const actualCode = diagnostic.code;
     return new MessageAndCode(actualMessage, actualCode);

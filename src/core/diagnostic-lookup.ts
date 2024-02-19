@@ -1,7 +1,23 @@
 import ts from 'typescript';
 
+export type DiagnosticInfo = {
+  fileName: string,
+  lineNumber: number,
+  messageText: string | ts.DiagnosticMessageChain,
+  code: number,
+};
+
+function createDiagnosticInfo(fileName: string, lineNumber: number, d: ts.Diagnostic): DiagnosticInfo {
+  return {
+    fileName,
+    lineNumber,
+    messageText: d.messageText,
+    code: d.code,
+  };
+}
+
 export class DiagnosticLookup {
-  private keyToDiagnostics = new Map<string, Array<ts.Diagnostic>>();
+  keyToDiagnostics = new Map<string, Array<DiagnosticInfo>>();
 
   constructor(program: ts.Program, emitResult: ts.EmitResult) {
     let allDiagnostics = ts
@@ -17,19 +33,25 @@ export class DiagnosticLookup {
     return this;
   }
 
-  add(sourceFile: ts.SourceFile, line: number, diagnostic: ts.Diagnostic): void {
-    const key = createKey(sourceFile, line);
+  add(sourceFile: ts.SourceFile, lineNumber: number, diagnostic: ts.Diagnostic): void {
+    const key = createKey(sourceFile, lineNumber);
     let diagnostics = this.keyToDiagnostics.get(key);
     if (diagnostics === undefined) {
-      diagnostics = new Array<ts.Diagnostic>();
+      diagnostics = new Array<DiagnosticInfo>();
       this.keyToDiagnostics.set(key, diagnostics);
     }
-    diagnostics.push(diagnostic);
+    diagnostics.push(
+      createDiagnosticInfo(sourceFile.fileName, lineNumber, diagnostic)
+    );
   }
 
-  get(sourceFile: ts.SourceFile, line: number): undefined | Array<ts.Diagnostic> {
+  getAndDelete(sourceFile: ts.SourceFile, line: number): undefined | Array<DiagnosticInfo> {
     const key = createKey(sourceFile, line);
-    return this.keyToDiagnostics.get(key);
+    const diagnostics = this.keyToDiagnostics.get(key);
+    if (diagnostics) {
+      this.keyToDiagnostics.delete(key);
+    }
+    return diagnostics;
   }
 }
 

@@ -15,3 +15,5 @@ computeDistance(obj); // OK
 computeDistance({ x: 1, y: 2, z: 3 });
 
 computeDistance({x: 1, y: 2}); // OK
+
+const result = true + false;

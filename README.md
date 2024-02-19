@@ -1,5 +1,7 @@
 # Testing TypeScript examples
 
+❌ Use if only a few files are involved. Otherwise use one of the related tools mentioned below.
+
 Challenges:
 
 * Testing expected static errors. In JavaScript, expected dynamic errors can be tested via:

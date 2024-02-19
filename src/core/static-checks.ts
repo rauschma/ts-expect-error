@@ -23,7 +23,7 @@ export function performStaticChecks(fileNames: string[], options: ts.CompilerOpt
     }
     staticCheckObserver.closeFile();
   }
-  staticCheckObserver.closeHandler();
+  staticCheckObserver.closeHandler(diagnosticLookup);
 }
 
 function handleTsExpectError(parts: string[], sourceFile: ts.SourceFile, node: ts.Node, diagnosticLookup: DiagnosticLookup, staticCheckObserver: StaticCheckHandler): ProcessingStatus {
@@ -34,7 +34,7 @@ function handleTsExpectError(parts: string[], sourceFile: ts.SourceFile, node: t
   const expected = MessageAndCode.fromCommentText(textAfterPrefix);
 
   const { line } = ts.getLineAndCharacterOfPosition(sourceFile, node.getStart(sourceFile, false));
-  const diagnostics = diagnosticLookup.get(sourceFile, line);
+  const diagnostics = diagnosticLookup.getAndDelete(sourceFile, line);
   if (diagnostics === undefined) {
     staticCheckObserver.collect(new StaticCheck({
       line,

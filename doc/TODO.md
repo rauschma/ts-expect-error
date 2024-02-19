@@ -1,18 +1,9 @@
 # Todos
 
-* stdout vs. stderr, exit code
-* Check defaults for `ts.CompilerOptions` in `expect-error.ts`
-
-```ts
-const configPath = ts.findConfigFile(
-  /*searchPath*/ "./",
-  ts.sys.fileExists,
-  "tsconfig.json"
-);
-if (!configPath) {
-  throw new Error("Could not find a valid 'tsconfig.json'.");
-}
-```
+* Reporting:
+  * `LoggingStaticCheckHandler`: Combine ts-expect-error results (per-file) with other detected errors (global)
+  * Output: stdout vs. stderr
+  * Non-zero exit code if errors were detected
 
 
 

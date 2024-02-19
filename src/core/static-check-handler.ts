@@ -1,4 +1,5 @@
 import ts from 'typescript';
+import type { DiagnosticLookup } from './diagnostic-lookup.js';
 import { RE_TS_EXPECT_ERROR_PREFIX_G } from './extract-comment-text.js';
 
 interface StaticCheckProps {
@@ -21,7 +22,7 @@ export interface StaticCheckHandler {
   openFile(sourceFile: ts.SourceFile): void;
   collect(staticCheck: StaticCheck): void;
   closeFile(): void;
-  closeHandler(): void;
+  closeHandler(diagnosticLookup: DiagnosticLookup): void;
 }
 
 export class LoggingStaticCheckHandler implements StaticCheckHandler {
@@ -68,8 +69,11 @@ export class LoggingStaticCheckHandler implements StaticCheckHandler {
     this.sourceFile = null;
     this.staticChecks.length = 0;
   }
-  closeHandler(): void {
+  closeHandler(diagnosticLookup: DiagnosticLookup): void {
     console.log(`### DONE (failures: ${this.totalFailureCount}, successes: ${this.totalSuccessCount})`);
+    for (const diagnostic of Array.from(diagnosticLookup.keyToDiagnostics.values()).flat()) {
+      console.log(diagnostic);
+    }
   }
 }
 
