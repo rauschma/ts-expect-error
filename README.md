@@ -35,7 +35,7 @@ These tools are related:
   * Example: https://www.typescriptlang.org/v2/en/tsconfig#strictFunctionTypes
   * Upsides:
     * Powerful
-    * Awesome for web content (tooltips, colors, etc.)
+    * Great for web content (tooltips, colors, etc.)
   * Downsides:
     * Doesn’t tie errors to specific lines in the code
     * Less suited for PDFs and print
