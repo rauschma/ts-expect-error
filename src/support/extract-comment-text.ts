@@ -5,7 +5,7 @@ import { normalizeWhitespace } from '../util/strings.js';
 export const RE_TS_EXPECT_ERROR_PREFIX = /^\/\/ *%ts-expect-error:/u;
 export const RE_TS_EXPECT_ERROR_PREFIX_G = globalizeRegExp(RE_TS_EXPECT_ERROR_PREFIX);
 
-export function extractCommentText(commentParts: string[], prefixRegExp: RegExp): null | string {
+export function extractCommentText(commentParts: Array<string>, prefixRegExp: RegExp): null | string {
   for (const [index, commentPart] of commentParts.entries()) {
     const match = prefixRegExp.exec(commentPart);
     if (match) {
@@ -18,7 +18,7 @@ export function extractCommentText(commentParts: string[], prefixRegExp: RegExp)
 }
 
 const COMMENT_PREFIX = '//';
-function extractTextFromParts(startText: string, commentParts: string[], startIndex: number) {
+function extractTextFromParts(startText: string, commentParts: Array<string>, startIndex: number) {
   if (commentParts.length < 1) {
     throw new InternalError(JSON.stringify(commentParts));
   }

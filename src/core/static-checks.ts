@@ -1,12 +1,12 @@
 import ts from 'typescript';
 import { assertNonNullable } from '../util/type.js';
 import { createPatchedCompilerHost, iterAstNodes } from './compiler-helpers.js';
-import { FileDiagnosticLookup, ProgramDiagnosticLookup } from './diagnostic-lookup.js';
-import { RE_TS_EXPECT_ERROR_PREFIX, extractCommentText } from './extract-comment-text.js';
-import { ActualMessageAndCode, ExpectedMessageAndCode } from './message-and-code.js';
+import { FileDiagnosticLookup, ProgramDiagnosticLookup } from '../support/diagnostic-lookup.js';
+import { RE_TS_EXPECT_ERROR_PREFIX, extractCommentText } from '../support/extract-comment-text.js';
+import { ActualMessageAndCode, ExpectedMessageAndCode } from '../support/message-and-code.js';
 import { NormalStatusLogger, type StatusLogger } from './status-logger.js';
 
-export function performStaticChecks(fileNames: string[], options: ts.CompilerOptions): number {
+export function performStaticChecks(fileNames: Array<string>, options: ts.CompilerOptions): number {
   const program = ts.createProgram(fileNames, options, createPatchedCompilerHost(options, fileNames));
   const diagnosticLookup = new ProgramDiagnosticLookup(
     program,
@@ -32,7 +32,7 @@ export function performStaticChecks(fileNames: string[], options: ts.CompilerOpt
   return statusLogger.getExitCode();
 }
 
-function handleTsExpectError(parts: string[], sourceFile: ts.SourceFile, node: ts.Node, diagnosticLookup: FileDiagnosticLookup, statusLogger: StatusLogger): ProcessingStatus {
+function handleTsExpectError(parts: Array<string>, sourceFile: ts.SourceFile, node: ts.Node, diagnosticLookup: FileDiagnosticLookup, statusLogger: StatusLogger): ProcessingStatus {
   const textAfterPrefix = extractCommentText(parts, RE_TS_EXPECT_ERROR_PREFIX);
   if (textAfterPrefix === null) {
     return ProcessingStatus.NoMatch;

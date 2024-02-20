@@ -1,7 +1,7 @@
 import ts from 'typescript';
 import { assertNonNullable } from '../util/type.js';
-import type { FileDiagnosticLookup } from './diagnostic-lookup.js';
-import { RE_TS_EXPECT_ERROR_PREFIX_G } from './extract-comment-text.js';
+import type { FileDiagnosticLookup } from '../support/diagnostic-lookup.js';
+import { RE_TS_EXPECT_ERROR_PREFIX_G } from '../support/extract-comment-text.js';
 
 export interface StaticCheck {
   line: number,

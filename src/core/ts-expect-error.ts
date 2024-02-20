@@ -1,13 +1,15 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S node --no-warnings=ExperimentalWarning
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import type { ParseArgsConfig } from 'node:util';
 import * as util from 'node:util';
 import ts from 'typescript';
-import { performStaticChecks } from './core/static-checks.js';
+import { performStaticChecks } from './static-checks.js';
+//@ts-expect-error
+import pkg from '#package_json' with {type: "json"};
 
-const BIN_NAME = 'expect-error';
+const BIN_NAME = 'ts-expect-error';
 
 const OPTIONS = {
   'tsconfig': {
@@ -17,12 +19,30 @@ const OPTIONS = {
     type: 'boolean',
     short: 'h',
   },
+  'version': {
+    type: 'boolean',
+    short: 'v',
+  },
 } satisfies ParseArgsConfig['options'];
 
 function main() {
   const args = util.parseArgs({ allowPositionals: true, options: OPTIONS });
+
+  if (args.values.version) {
+    console.log(pkg.version);
+    return;
+  }
   if (args.values.help || args.positionals.length === 0) {
-    console.log(`${BIN_NAME} [--tsconfig tsconfig.json] «file-or-dir-1» «file-or-dir-2» ...`);
+    const helpLines = [
+      `${BIN_NAME} [--tsconfig tsconfig.json] «file-or-dir-1» «file-or-dir-2» ...`,
+      '',
+      'More options:',
+      '--help -h: get help',
+      '--version -v: print version',
+    ];
+    for (const line of helpLines) {
+      console.log(line);
+    }
     return;
   }
 
@@ -51,11 +71,11 @@ function main() {
   process.exitCode = performStaticChecks(pathNames, options);
 }
 
-function* expandDirectories(paths: string[]): Iterable<string> {
+function* expandDirectories(paths: Array<string>): Iterable<string> {
   for (const p of paths) {
     if (fs.statSync(p).isDirectory()) {
       for (const dirent of fs.readdirSync(p, { withFileTypes: true, recursive: true })) {
-        if (dirent.isFile() && /\.(ts|tsx)$/.test(dirent.path)) {
+        if (dirent.isFile() && /\.(ts|tsx|mts|cts)$/.test(dirent.path)) {
           yield path.resolve(p, dirent.path);
         }
       }

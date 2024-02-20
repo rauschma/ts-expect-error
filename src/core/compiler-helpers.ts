@@ -5,7 +5,7 @@ import ts from 'typescript';
 /**
  * @see https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API#customizing-module-resolution
  */
-export function createPatchedCompilerHost(options: ts.CompilerOptions, fileNames: string[]): ts.CompilerHost {
+export function createPatchedCompilerHost(options: ts.CompilerOptions, fileNames: Array<string>): ts.CompilerHost {
   const fileNameSet = new Set(fileNames);
   const host = ts.createCompilerHost(options);
   const originalGetSourceFile = host.getSourceFile;
@@ -39,7 +39,7 @@ const UNYIELDED_SYNTAX_KINDS = new Set<ts.SyntaxKind>([
 ]);
 
 export interface IterNodeValue {
-  commentParts: string[];
+  commentParts: Array<string>;
   node: ts.Node;
 }
 

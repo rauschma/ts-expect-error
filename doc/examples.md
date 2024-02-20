@@ -1,8 +1,6 @@
-https://gist.github.com/rauschma/4d1ee06e47e03545d4c4b31b59700786
+# Use cases for checking `@ts-expect-error`
 
-# Use cases for `@ts-expect-error` with error message
-
-Benefit of this approach: Very similar to `assert.throws()` in that type checking doesn’t fail if everything is as expected.
+This approach is similar to `assert.throws()` in that type checking doesn’t fail if everything is as expected.
 
 ## `https://exploringjs.com/tackling-ts/ch_any-unknown.html`
 
