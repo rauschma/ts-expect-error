@@ -13,9 +13,6 @@ const OPTIONS = {
   'tsconfig': {
     type: 'string',
   },
-  'trace': { // to be implemented: log all checks
-    type: 'boolean',
-  },
   'help': {
     type: 'boolean',
     short: 'h',
@@ -51,7 +48,7 @@ function main() {
   }
 
   const pathNames = [...expandDirectories(args.positionals)];
-  performStaticChecks(pathNames, options);
+  process.exitCode = performStaticChecks(pathNames, options);
 }
 
 function* expandDirectories(paths: string[]): Iterable<string> {

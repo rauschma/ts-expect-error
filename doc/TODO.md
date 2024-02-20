@@ -1,10 +1,6 @@
 # Todos
 
-* Reporting:
-  * `LoggingStaticCheckHandler`: Combine ts-expect-error results (per-file) with other detected errors (global)
-  * Output: stdout vs. stderr
-  * Non-zero exit code if errors were detected
-
+* Report static errors only if a CLI flag is present?
 
 
 

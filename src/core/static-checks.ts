@@ -1,67 +1,73 @@
 import ts from 'typescript';
+import { assertNonNullable } from '../util/type.js';
 import { createPatchedCompilerHost, iterAstNodes } from './compiler-helpers.js';
-import { DiagnosticLookup } from './diagnostic-lookup.js';
+import { FileDiagnosticLookup, ProgramDiagnosticLookup } from './diagnostic-lookup.js';
 import { RE_TS_EXPECT_ERROR_PREFIX, extractCommentText } from './extract-comment-text.js';
-import { MessageAndCode, expectedMatchesActual } from './message-and-code.js';
-import { LoggingStaticCheckHandler, StaticCheck, type StaticCheckHandler } from './static-check-handler.js';
+import { ActualMessageAndCode, ExpectedMessageAndCode } from './message-and-code.js';
+import { NormalStatusLogger, type StatusLogger } from './status-logger.js';
 
-export function performStaticChecks(fileNames: string[], options: ts.CompilerOptions): void {
+export function performStaticChecks(fileNames: string[], options: ts.CompilerOptions): number {
   const program = ts.createProgram(fileNames, options, createPatchedCompilerHost(options, fileNames));
-  const emitResult = program.emit();
-  const diagnosticLookup = new DiagnosticLookup(program, emitResult);
+  const diagnosticLookup = new ProgramDiagnosticLookup(
+    program,
+    program.emit()
+  );
 
-  const staticCheckObserver = new LoggingStaticCheckHandler();
+  const statusLogger = new NormalStatusLogger();
   for (const file of fileNames) {
     const sourceFile = program.getSourceFile(file);
     if (sourceFile === undefined) continue;
-    staticCheckObserver.openFile(sourceFile);
 
+    const fileDiagnosticLookup = diagnosticLookup.fileNameToLookup.get(sourceFile.fileName);
+    assertNonNullable(fileDiagnosticLookup);
+    statusLogger.startFile(sourceFile);
     for (const { node, commentParts } of iterAstNodes(sourceFile)) {
-      if (handleTsExpectError(commentParts, sourceFile, node, diagnosticLookup, staticCheckObserver) === ProcessingStatus.FoundMatch) {
+      if (handleTsExpectError(commentParts, sourceFile, node, fileDiagnosticLookup, statusLogger) === ProcessingStatus.FoundMatch) {
         continue;
       }
     }
-    staticCheckObserver.closeFile();
+    statusLogger.endFile(fileDiagnosticLookup);
   }
-  staticCheckObserver.closeHandler(diagnosticLookup);
+  statusLogger.endLogging();
+  return statusLogger.getExitCode();
 }
 
-function handleTsExpectError(parts: string[], sourceFile: ts.SourceFile, node: ts.Node, diagnosticLookup: DiagnosticLookup, staticCheckObserver: StaticCheckHandler): ProcessingStatus {
+function handleTsExpectError(parts: string[], sourceFile: ts.SourceFile, node: ts.Node, diagnosticLookup: FileDiagnosticLookup, statusLogger: StatusLogger): ProcessingStatus {
   const textAfterPrefix = extractCommentText(parts, RE_TS_EXPECT_ERROR_PREFIX);
   if (textAfterPrefix === null) {
     return ProcessingStatus.NoMatch;
   }
-  const expected = MessageAndCode.fromCommentText(textAfterPrefix);
+  const expected = new ExpectedMessageAndCode(textAfterPrefix);
 
   const { line } = ts.getLineAndCharacterOfPosition(sourceFile, node.getStart(sourceFile, false));
-  const diagnostics = diagnosticLookup.getAndDelete(sourceFile, line);
+  const diagnostics = diagnosticLookup.getAndDelete(line);
   if (diagnostics === undefined) {
-    staticCheckObserver.collect(new StaticCheck({
+    statusLogger.logStaticCheck({
       line,
       expected: 'EXPECTED ERROR: ' + expected,
       actual: 'ACTUAL ERROR: (No errors in this line)',
       checkSucceeded: false,
-    }));
+    });
     return ProcessingStatus.FoundMatch;
   }
   if (diagnostics.length !== 1) {
-    staticCheckObserver.collect(new StaticCheck({
+    statusLogger.logStaticCheck({
       line,
       expected: 'EXPECTED ERROR: ' + expected,
       actual: 'ACTUAL ERROR: (More than one error in this line)',
       checkSucceeded: false,
-    }));
+    });
     return ProcessingStatus.FoundMatch;
   }
-  const actual = MessageAndCode.fromDiagnostic(diagnostics[0]);
+  const actual = new ActualMessageAndCode(diagnostics[0]);
 
-  const checkPassed = expectedMatchesActual(expected, actual);
-  staticCheckObserver.collect(new StaticCheck({
+  const checkPassed = expected.matchesActual(actual);
+  statusLogger.logStaticCheck({
     line,
     expected: 'EXPECTED ERROR: ' + expected,
     actual: 'ACTUAL ERROR:   ' + actual,
     checkSucceeded: checkPassed,
-  }));
+  });
   return ProcessingStatus.FoundMatch;
 }
 
