@@ -1,7 +1,7 @@
 import ts from 'typescript';
-import { assertNonNullable } from '../util/type.js';
 import type { FileDiagnosticLookup } from '../support/diagnostic-lookup.js';
 import { RE_TS_EXPECT_ERROR_PREFIX_G } from '../support/extract-comment-text.js';
+import { assertNonNullable } from '../util/type.js';
 
 export interface StaticCheck {
   line: number,
@@ -13,7 +13,7 @@ export interface StaticCheck {
 export interface StatusLogger {
   startFile(sourceFile: ts.SourceFile): void;
   logStaticCheck(staticCheck: StaticCheck): void;
-  endFile(fileDiagnosticLookup: FileDiagnosticLookup): void;
+  endFile(fileDiagnosticLookup: undefined | FileDiagnosticLookup, singleFileMode: boolean): void;
   endLogging(): void;
 }
 
@@ -37,11 +37,15 @@ export class NormalStatusLogger implements StatusLogger {
       this.failures.push(staticCheck);
     }
   }
-  endFile(fileDiagnosticLookup: FileDiagnosticLookup) {
+  endFile(fileDiagnosticLookup: undefined | FileDiagnosticLookup, singleFileMode: boolean) {
     assertNonNullable(this.sourceFile);
-    this.fileCounts.errorCount += fileDiagnosticLookup.lineNumberToDiagnostics.size;
-    this.totalCounts.errorCount += fileDiagnosticLookup.lineNumberToDiagnostics.size;
-    console.log(`=== ${this.sourceFile.fileName} (${this.fileCounts.toString()}) ${this.fileCounts.toStatusEmoji()}`);
+    if (fileDiagnosticLookup) {
+      this.fileCounts.errorCount += fileDiagnosticLookup.lineNumberToDiagnostics.size;
+      this.totalCounts.errorCount += fileDiagnosticLookup.lineNumberToDiagnostics.size;
+    }
+    if (!singleFileMode) {
+      console.log(`=== ${this.sourceFile.fileName} (${this.fileCounts.toString()}) ${this.fileCounts.toStatusEmoji()}`);
+    }
 
     const checksInFile = countChecks(this.sourceFile.text);
     const performedChecks = this.fileCounts.successCount + this.fileCounts.failureCount;
@@ -55,11 +59,16 @@ export class NormalStatusLogger implements StatusLogger {
       console.log(`  ${check.actual}`);
     }
 
-    for (const diagnosticInfo of Array.from(fileDiagnosticLookup.lineNumberToDiagnostics.values()).flat()) {
-      console.log(`- LINE ${diagnosticInfo.lineNumber + 1}: ${diagnosticInfo.messageText} (${diagnosticInfo.code})`);
+    if (fileDiagnosticLookup) {
+      for (const diagnosticInfo of Array.from(fileDiagnosticLookup.lineNumberToDiagnostics.values()).flat()) {
+        console.log(`- LINE ${diagnosticInfo.lineNumber + 1}: ${diagnosticInfo.messageText} (${diagnosticInfo.code})`);
+      }
     }
 
-    console.log(); // empty line
+    if (!singleFileMode) {
+      // Empty lines separate the status informations for the files
+      console.log();
+    }
 
     this.sourceFile = null;
     this.failures.length = 0;

@@ -1,5 +1,6 @@
 # Todos
 
+* Is it possible to retrieve files on demand (vs. listing them all ahead of time)?
 * GitHub issue: https://github.com/microsoft/TypeScript-Website/issues/298
 * Write tests that run the files in `demo/` and check the results
 * Detecting directives in code:

@@ -14,19 +14,21 @@ export function performStaticChecks(fileNames: Array<string>, options: ts.Compil
   );
 
   const statusLogger = new NormalStatusLogger();
+  const singleFileMode = (fileNames.length === 1);
   for (const file of fileNames) {
     const sourceFile = program.getSourceFile(file);
-    if (sourceFile === undefined) continue;
-
-    const fileDiagnosticLookup = diagnosticLookup.fileNameToLookup.get(sourceFile.fileName);
-    assertNonNullable(fileDiagnosticLookup);
+    assertNonNullable(sourceFile);
+    
     statusLogger.startFile(sourceFile);
-    for (const { node, commentParts } of iterAstNodes(sourceFile)) {
-      if (handleTsExpectError(commentParts, sourceFile, node, fileDiagnosticLookup, statusLogger) === ProcessingStatus.FoundMatch) {
-        continue;
+    const fileDiagnosticLookup = diagnosticLookup.fileNameToLookup.get(sourceFile.fileName);
+    if (fileDiagnosticLookup) {
+      for (const { node, commentParts } of iterAstNodes(sourceFile)) {
+        if (handleTsExpectError(commentParts, sourceFile, node, fileDiagnosticLookup, statusLogger) === ProcessingStatus.FoundMatch) {
+          continue;
+        }
       }
     }
-    statusLogger.endFile(fileDiagnosticLookup);
+    statusLogger.endFile(fileDiagnosticLookup, singleFileMode);
   }
   statusLogger.endLogging();
   return statusLogger.getExitCode();

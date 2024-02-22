@@ -287,14 +287,6 @@ let letSymbol2 = Symbol('letSymbol2') as const;
 ```
 
 ```ts
-type Spanish = 'no' | 'sí';
-type English = 'no' | 'yes';
-
-const spanishWord: Spanish = 'no';
-const englishWord: English = spanishWord;
-```
-
-```ts
 const spanishNo = Symbol('no');
 const spanishSí = Symbol('sí');
 type Spanish = typeof spanishNo | typeof spanishSí;
