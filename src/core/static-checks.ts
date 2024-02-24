@@ -1,34 +1,33 @@
 import ts from 'typescript';
-import { assertNonNullable } from '../util/type.js';
-import { createPatchedCompilerHost, iterAstNodes } from './compiler-helpers.js';
 import { FileDiagnosticLookup, ProgramDiagnosticLookup } from '../support/diagnostic-lookup.js';
 import { RE_TS_EXPECT_ERROR_PREFIX, extractCommentText } from '../support/extract-comment-text.js';
 import { ActualMessageAndCode, ExpectedMessageAndCode } from '../support/message-and-code.js';
+import { assertNonNullable } from '../util/type.js';
+import { createPatchedCompilerHost, iterAstNodes } from './compiler-helpers.js';
 import { NormalStatusLogger, type StatusLogger } from './status-logger.js';
 
-export function performStaticChecks(fileNames: Array<string>, options: ts.CompilerOptions): number {
+export function performStaticChecks(fileNames: Array<string>, options: ts.CompilerOptions, reportErrors: boolean): number {
   const program = ts.createProgram(fileNames, options, createPatchedCompilerHost(options, fileNames));
   const diagnosticLookup = new ProgramDiagnosticLookup(
     program,
     program.emit()
   );
 
-  const statusLogger = new NormalStatusLogger();
+  const statusLogger = new NormalStatusLogger(reportErrors);
   const singleFileMode = (fileNames.length === 1);
   for (const file of fileNames) {
     const sourceFile = program.getSourceFile(file);
     assertNonNullable(sourceFile);
     
     statusLogger.startFile(sourceFile);
+    // Returns `undefined` if tsc didn’t produce any diagnostics for a file.
     const fileDiagnosticLookup = diagnosticLookup.fileNameToLookup.get(sourceFile.fileName);
     if (fileDiagnosticLookup) {
       for (const { node, commentParts } of iterAstNodes(sourceFile)) {
-        if (handleTsExpectError(commentParts, sourceFile, node, fileDiagnosticLookup, statusLogger) === ProcessingStatus.FoundMatch) {
-          continue;
-        }
+        handleTsExpectError(commentParts, sourceFile, node, fileDiagnosticLookup, statusLogger);
       }
     }
-    statusLogger.endFile(fileDiagnosticLookup, singleFileMode);
+    statusLogger.endFile(fileDiagnosticLookup ?? new FileDiagnosticLookup(), singleFileMode);
   }
   statusLogger.endLogging();
   return statusLogger.getExitCode();

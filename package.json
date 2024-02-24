@@ -25,7 +25,7 @@
     "test": "node --test --enable-source-maps",
     "testall": "node --test --enable-source-maps \"./dist/**/*_test.js\"",
     "\n========== Publishing ==========": "",
-    "dry": "npm publish --dry-run",
+    "dry-run": "npm publish --dry-run",
     "prepublishOnly": "npm run build",
     "pack": "npm pack && tar --list --file ts-expect-error-*.tgz"
   },

@@ -13,15 +13,24 @@ export interface StaticCheck {
 export interface StatusLogger {
   startFile(sourceFile: ts.SourceFile): void;
   logStaticCheck(staticCheck: StaticCheck): void;
-  endFile(fileDiagnosticLookup: undefined | FileDiagnosticLookup, singleFileMode: boolean): void;
+  endFile(fileDiagnosticLookup: FileDiagnosticLookup, singleFileMode: boolean): void;
   endLogging(): void;
 }
 
 export class NormalStatusLogger implements StatusLogger {
   sourceFile: null | ts.SourceFile = null;
   failures: Array<StaticCheck> = [];
-  totalCounts = new StatusCounts();
-  fileCounts = new StatusCounts();
+  totalCounts;
+  fileCounts;
+
+  reportErrors;
+
+  constructor(reportErrors: boolean) {
+    this.reportErrors = reportErrors;
+    this.totalCounts = new StatusCounts(reportErrors);
+    this.fileCounts = new StatusCounts(reportErrors);
+  }
+
   startFile(sourceFile: ts.SourceFile) {
     this.sourceFile = sourceFile;
   }
@@ -37,12 +46,12 @@ export class NormalStatusLogger implements StatusLogger {
       this.failures.push(staticCheck);
     }
   }
-  endFile(fileDiagnosticLookup: undefined | FileDiagnosticLookup, singleFileMode: boolean) {
-    assertNonNullable(this.sourceFile);
-    if (fileDiagnosticLookup) {
-      this.fileCounts.errorCount += fileDiagnosticLookup.lineNumberToDiagnostics.size;
-      this.totalCounts.errorCount += fileDiagnosticLookup.lineNumberToDiagnostics.size;
-    }
+  endFile(fileDiagnosticLookup: FileDiagnosticLookup, singleFileMode: boolean) {
+    assertNonNullable(this.sourceFile); // initialized by now
+
+    this.fileCounts.errorCount += fileDiagnosticLookup.lineNumberToDiagnostics.size;
+    this.totalCounts.errorCount += fileDiagnosticLookup.lineNumberToDiagnostics.size;
+
     if (!singleFileMode) {
       console.log(`=== ${this.sourceFile.fileName} (${this.fileCounts.toString()}) ${this.fileCounts.toStatusEmoji()}`);
     }
@@ -59,7 +68,7 @@ export class NormalStatusLogger implements StatusLogger {
       console.log(`  ${check.actual}`);
     }
 
-    if (fileDiagnosticLookup) {
+    if (this.reportErrors) {
       for (const diagnosticInfo of Array.from(fileDiagnosticLookup.lineNumberToDiagnostics.values()).flat()) {
         console.log(`- LINE ${diagnosticInfo.lineNumber + 1}: ${diagnosticInfo.messageText} (${diagnosticInfo.code})`);
       }
@@ -90,18 +99,34 @@ class StatusCounts {
   successCount = 0;
   failureCount = 0;
   errorCount = 0;
+
+  #reportErrors;
+
+  constructor(reportErrors: boolean) {
+    this.#reportErrors = reportErrors;
+  }
+
+  get #totalCount() {
+    return this.failureCount + (
+      this.#reportErrors ? this.errorCount : 0
+    );
+  }
+
   reset(): void {
     this.successCount = 0;
     this.failureCount = 0;
     this.errorCount = 0;
   }
   toString(): string {
-    return `successes: ${this.successCount}, failures: ${this.failureCount}, errors: ${this.errorCount}`;
+    return (
+      `successes: ${this.successCount}, failures: ${this.failureCount}`
+      + (this.#reportErrors ? `, errors: ${this.errorCount}` : ``)
+    );
   }
   toStatusEmoji(): string {
-    return (this.failureCount + this.errorCount) === 0 ? '✅' : '❌';
+    return this.#totalCount === 0 ? '✅' : '❌';
   }
   getExitCode(): number {
-    return (this.failureCount + this.errorCount) === 0 ? 0 : 1;
+    return this.#totalCount === 0 ? 0 : 1;
   }
 }
