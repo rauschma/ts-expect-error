@@ -1,5 +1,5 @@
 
-// @ts-expect-error: There actually is no error!
+// @ts-expect-error: Error expected but not there!
 const result1 = 3 + 4;
 
 // @ts-expect-error: Operator '+' cannot be applied to types 'boolean' and

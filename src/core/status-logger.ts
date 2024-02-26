@@ -53,7 +53,7 @@ export class NormalStatusLogger implements StatusLogger {
     this.totalCounts.errorCount += fileDiagnosticLookup.lineNumberToDiagnostics.size;
 
     if (!singleFileMode) {
-      console.log(`=== ${this.sourceFile.fileName} (${this.fileCounts.toString()}) ${this.fileCounts.toStatusEmoji()}`);
+      console.log(`::::: ${this.sourceFile.fileName} (${this.fileCounts.toString()}) ${this.fileCounts.getStatusEmoji()}`);
     }
 
     const checksInFile = countChecks(this.sourceFile.text);
@@ -63,14 +63,14 @@ export class NormalStatusLogger implements StatusLogger {
     }
 
     for (const check of this.failures) {
-      console.log(`– LINE ${check.line + 1}:`);
+      console.log(`• LINE ${check.line + 1}:`);
       console.log(`  ${check.expected}`);
       console.log(`  ${check.actual}`);
     }
 
     if (this.reportErrors) {
       for (const diagnosticInfo of Array.from(fileDiagnosticLookup.lineNumberToDiagnostics.values()).flat()) {
-        console.log(`- LINE ${diagnosticInfo.lineNumber + 1}: ${diagnosticInfo.messageText} (${diagnosticInfo.code})`);
+        console.log(`• LINE ${diagnosticInfo.lineNumber + 1}: ${diagnosticInfo.messageText} (${diagnosticInfo.code})`);
       }
     }
 
@@ -84,7 +84,7 @@ export class NormalStatusLogger implements StatusLogger {
     this.fileCounts.reset();
   }
   endLogging(): void {
-    console.log(`### DONE (${this.totalCounts.toString()}) ${this.totalCounts.toStatusEmoji()}`);
+    console.log(`${this.totalCounts.getStatusEmoji()} DONE (${this.totalCounts.toString()})`);
   }
   getExitCode(): number {
     return this.totalCounts.getExitCode();
@@ -123,8 +123,8 @@ class StatusCounts {
       + (this.#reportErrors ? `, errors: ${this.errorCount}` : ``)
     );
   }
-  toStatusEmoji(): string {
-    return this.#totalCount === 0 ? '✅' : '❌';
+  getStatusEmoji(): string {
+    return this.#totalCount === 0 ? '✔︎' : '×';
   }
   getExitCode(): number {
     return this.#totalCount === 0 ? 0 : 1;
