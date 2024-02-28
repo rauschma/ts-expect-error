@@ -6,11 +6,11 @@ import * as path from 'node:path';
 import type { ParseArgsConfig } from 'node:util';
 import * as util from 'node:util';
 import ts from 'typescript';
-import { performStaticChecks } from './static-checks.js';
+import { performStaticChecks } from './core/static-checks.js';
 //@ts-expect-error: Module '#package_json' has no default export.
 import pkg from '#package_json' with { type: "json" };
 
-const BIN_NAME = 'ts-expect-error';
+const BIN_NAME = 'expect-error';
 
 const OPTIONS = {
   'tsconfig': {

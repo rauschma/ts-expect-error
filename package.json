@@ -1,10 +1,10 @@
 {
-  "name": "ts-expect-error",
+  "name": "@rauschma/expect-error",
   "version": "0.1.0",
   "author": "Axel Rauschmayer",
   "description": "A tool that checks if //@ts-expect-error suppresses the right errors",
   "license": "MIT",
-  "repository": "github:rauschma/ts-expect-error",
+  "repository": "github:rauschma/expect-error",
   "type": "module",
   "files": [
     "package.json",
@@ -13,21 +13,20 @@
     "dist/**/*.js"
   ],
   "bin": {
-    "ts-expect-error": "./dist/src/core/ts-expect-error.js",
-    "tsee": "./dist/src/core/ts-expect-error.js"
+    "expect-error": "./dist/src/expect-error.js"
   },
   "scripts": {
     "build": "npm run clean && tsc && npm run chmod",
     "watch": "tsc --watch",
     "clean": "shx rm -rf ./dist/*",
-    "chmod": "chmod u+x ./dist/src/core/ts-expect-error.js",
+    "chmod": "chmod u+x ./dist/src/expect-error.js",
     "\n========== Testing ==========": "",
     "test": "node --test --enable-source-maps",
     "testall": "node --test --enable-source-maps \"./dist/**/*_test.js\"",
     "\n========== Publishing ==========": "",
     "dry-run": "npm publish --dry-run",
     "prepublishOnly": "npm run build",
-    "pack": "npm pack && tar --list --file ts-expect-error-*.tgz"
+    "pack": "npm pack && tar --list --file rauschma-expect-error-*.tgz"
   },
   "imports": {
     "#package_json": "./package.json"
