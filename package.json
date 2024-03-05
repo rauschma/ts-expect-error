@@ -26,7 +26,7 @@
     "\n========== Publishing ==========": "",
     "dry-run": "npm publish --dry-run",
     "prepublishOnly": "npm run build",
-    "pack": "npm pack && tar --list --file rauschma-expect-error-*.tgz"
+    "pack": "npm pack && tar --list --file ts-expect-error-*.tgz"
   },
   "imports": {
     "#package_json": "./package.json"
