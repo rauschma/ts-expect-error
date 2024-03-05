@@ -41,15 +41,12 @@ export class ExpectedMessageAndCode {
   }
   matchesActual(actual: ActualMessageAndCode) {
     if (this.message !== null) {
+      let expectedPrefix = this.message;
       if (this.message.endsWith(ELLIPSIS)) {
-        const prefix = removeSuffix(this.message, ELLIPSIS).trimEnd();
-        if (!actual.message.startsWith(prefix)) {
-          return false;
-        }
-      } else {
-        if (this.message !== actual.message) {
-          return false;
-        }
+        expectedPrefix = removeSuffix(this.message, ELLIPSIS).trimEnd();
+      }
+      if (!actual.message.startsWith(expectedPrefix)) {
+        return false;
       }
     }
     if (this.code !== null && this.code !== actual.code) {
