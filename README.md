@@ -22,7 +22,7 @@ There are tools for checking such examples – e.g.:
 ts-expect-error is to be used by such tools:
 
 * It ensures that `@ts-expect-error` suppresses the right errors.
-* It can also report static compiler errors (CLI option `--errors`). That helps when using [`tsx`](https://github.com/privatenumber/tsx) to run TypeScript code because `tsx` does not perform static checks.
+* It can also report static compiler errors (CLI option `--unexpected-errors`). That helps when using [`tsx`](https://github.com/privatenumber/tsx) to run TypeScript code because `tsx` does not perform static checks.
 * It performs its checks in RAM and does not change files on disk.
 
 ## Usage

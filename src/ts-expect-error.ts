@@ -16,7 +16,7 @@ const OPTIONS = {
   'tsconfig': {
     type: 'string',
   },
-  'errors': {
+  'unexpected-errors': {
     type: 'boolean',
     short: 'e',
   },
@@ -44,7 +44,7 @@ function main() {
       'More options:',
       '--help -h: get help',
       '--version -v: print version',
-      '--errors -e: report unexpected errors detected by TypeScript',
+      '--unexpected-errors -e: report unexpected errors detected by TypeScript',
     ];
     for (const line of helpLines) {
       console.log(line);
@@ -77,7 +77,7 @@ function main() {
     };
   }
 
-  const reportErrors = args.values.errors ?? false;
+  const reportErrors = args.values['unexpected-errors'] ?? false;
   const pathNames = [...expandDirectories(args.positionals)];
   process.exitCode = performStaticChecks(pathNames, options, reportErrors);
 }
