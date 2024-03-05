@@ -7,6 +7,10 @@ import { createPatchedCompilerHost, iterAstNodes } from './compiler-helpers.js';
 import { NormalStatusLogger, type StatusLogger } from './status-logger.js';
 
 export function performStaticChecks(fileNames: Array<string>, options: ts.CompilerOptions, reportErrors: boolean): number {
+  // “`include`, `exclude`, and `files` [in tsconfig.json] are all
+  // tsconfig-only things that work together to produce a set of rootNames
+  // [`fileNames` below].”
+  // https://github.com/Microsoft/TypeScript/issues/29960
   const program = ts.createProgram(fileNames, options, createPatchedCompilerHost(options, fileNames));
   const diagnosticLookup = new ProgramDiagnosticLookup(
     program,
@@ -15,8 +19,8 @@ export function performStaticChecks(fileNames: Array<string>, options: ts.Compil
 
   const statusLogger = new NormalStatusLogger(reportErrors);
   const singleFileMode = (fileNames.length === 1);
-  for (const file of fileNames) {
-    const sourceFile = program.getSourceFile(file);
+  for (const fileName of fileNames) {
+    const sourceFile = program.getSourceFile(fileName);
     assertNonNullable(sourceFile);
     
     statusLogger.startFile(sourceFile);

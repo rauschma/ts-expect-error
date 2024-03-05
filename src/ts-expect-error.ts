@@ -10,13 +10,13 @@ import { performStaticChecks } from './core/static-checks.js';
 //@ts-expect-error: Module '#package_json' has no default export.
 import pkg from '#package_json' with { type: "json" };
 
-const BIN_NAME = 'expect-error';
+const BIN_NAME = 'ts-expect-error';
 
 const OPTIONS = {
   'tsconfig': {
     type: 'string',
   },
-  'report-errors': {
+  'errors': {
     type: 'boolean',
     short: 'e',
   },
@@ -44,7 +44,7 @@ function main() {
       'More options:',
       '--help -h: get help',
       '--version -v: print version',
-      '--report-errors -e: report unexpected errors detected by TypeScript',
+      '--errors -e: report unexpected errors detected by TypeScript',
     ];
     for (const line of helpLines) {
       console.log(line);
@@ -77,7 +77,7 @@ function main() {
     };
   }
 
-  const reportErrors = args.values['report-errors'] ?? false;
+  const reportErrors = args.values.errors ?? false;
   const pathNames = [...expandDirectories(args.positionals)];
   process.exitCode = performStaticChecks(pathNames, options, reportErrors);
 }

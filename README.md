@@ -1,4 +1,6 @@
-# Checking `@ts-expect-error` comments
+# `ts-expect-error`: checking `@ts-expect-error` comments
+
+## What does `ts-expect-error` do?
 
 Scenario: We are documenting how TypeScript works, via small examples embedded in Markdown – e.g.:
 
@@ -20,10 +22,12 @@ There are tools for checking such examples – e.g.:
 `ts-expect-error` is to be used by such tools:
 
 * It ensures that `@ts-expect-error` suppresses the right errors.
-* It also reports static compiler errors. That helps when using [`tsx`](https://github.com/privatenumber/tsx) to run TypeScript code because `tsx` does not perform static checks.
+* It can also report static compiler errors (CLI option `--errors`). That helps when using [`tsx`](https://github.com/privatenumber/tsx) to run TypeScript code because `tsx` does not perform static checks.
 * It performs its checks in RAM and does not change files on disk.
 
-It is invoked like this:
+## Usage
+
+`ts-expect-error` is invoked like this:
 
 ```
 ts-expect-error [--tsconfig tsconfig.json] «file-or-dir-1» «file-or-dir-2» ...
@@ -34,6 +38,11 @@ Get help via:
 ```js
 ts-expect-error -h
 ```
+
+### Usage caveats
+
+* This tool is relatively slow – but it’s worth using it if you are writing about TypeScript because your material will contain fewer errors.
+* If you are not providing a `tsconfig.json`, you have to list all files that make up a program (only listing the entry point is not enough). That seems to be a limitation of the tsc API and I have not found a way around it. If you know better then please tell me!
 
 ## Installation
 
@@ -67,6 +76,7 @@ npx ts-expect-error some-file.ts
 // @ts-expect-error: (1234)
 ```
 
+* The `[...]` is optional. `ts-expect-error` checks if the actual message starts with the given message.
 * If there is no colon (:) after `@ts-expect-error` then no checking is performed!
 * At most one error per `@ts-expect-error` is allowed. That may change in the future – if there is a need for it (I haven’t had one, so far).
 

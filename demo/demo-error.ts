@@ -1,2 +1,2 @@
-// Only reported with --report-errors
+// Only reported with --errors
 const result = false + true;

@@ -1,10 +1,10 @@
 {
-  "name": "@rauschma/expect-error",
+  "name": "ts-expect-error",
   "version": "0.1.0",
   "author": "Axel Rauschmayer",
   "description": "A tool that checks if //@ts-expect-error suppresses the right errors",
   "license": "MIT",
-  "repository": "github:rauschma/expect-error",
+  "repository": "github:rauschma/ts-expect-error",
   "type": "module",
   "files": [
     "package.json",
@@ -13,13 +13,13 @@
     "dist/**/*.js"
   ],
   "bin": {
-    "expect-error": "./dist/src/expect-error.js"
+    "ts-expect-error": "./dist/src/ts-expect-error.js"
   },
   "scripts": {
     "build": "npm run clean && tsc && npm run chmod",
     "watch": "tsc --watch",
     "clean": "shx rm -rf ./dist/*",
-    "chmod": "chmod u+x ./dist/src/expect-error.js",
+    "chmod": "chmod u+x ./dist/src/ts-expect-error.js",
     "\n========== Testing ==========": "",
     "test": "node --test --enable-source-maps",
     "testall": "node --test --enable-source-maps \"./dist/**/*_test.js\"",
