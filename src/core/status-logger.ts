@@ -84,7 +84,7 @@ export class NormalStatusLogger implements StatusLogger {
     this.fileCounts.reset();
   }
   endLogging(): void {
-    console.log(`${this.totalCounts.getStatusEmoji()} DONE (${this.totalCounts.toString()})`);
+    console.log(`::::: DONE (${this.totalCounts.toString()}) ${this.totalCounts.getStatusEmoji()}`);
   }
   getExitCode(): number {
     return this.totalCounts.getExitCode();
