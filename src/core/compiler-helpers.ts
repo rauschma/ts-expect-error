@@ -16,7 +16,10 @@ export function createPatchedCompilerHost(options: ts.CompilerOptions, fileNames
     if (fileNameSet.has(fileName)) {
       let sourceText = ts.sys.readFile(fileName);
       if (sourceText !== undefined) {
-        sourceText = sourceText.replace(/(\/\/ *)@ts-expect-error/ug, '$1%ts-expect-error');
+        sourceText = sourceText.replaceAll(
+          /(\/\/ *)@ts-expect-error: /ug,
+          '$1%ts-expect-error'
+        );
         return ts.createSourceFile(fileName, sourceText, languageVersion);
       } else {
         return undefined;
