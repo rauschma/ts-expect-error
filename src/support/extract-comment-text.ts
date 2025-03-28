@@ -24,7 +24,7 @@ function extractTextFromParts(startText: string, commentParts: Array<string>, st
   }
   let commentText = startText;
   for (let i = startIndex; i < commentParts.length; i++) {
-    const part = commentParts[i];
+    const part = commentParts[i]!;
     if (!part.startsWith(COMMENT_PREFIX)) {
       throw new InternalError(JSON.stringify(commentParts));
     }

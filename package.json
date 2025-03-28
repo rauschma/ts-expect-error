@@ -1,6 +1,6 @@
 {
   "name": "ts-expect-error",
-  "version": "0.1.0",
+  "version": "0.2",
   "author": "Axel Rauschmayer",
   "description": "A tool that checks if //@ts-expect-error suppresses the right errors",
   "license": "MIT",
@@ -24,18 +24,18 @@
     "test": "node --test --enable-source-maps",
     "testall": "node --test --enable-source-maps \"./dist/**/*_test.js\"",
     "\n========== Publishing ==========": "",
-    "dry-run": "npm publish --dry-run",
     "prepublishOnly": "npm run build",
-    "pack": "npm pack && tar --list --file ts-expect-error-*.tgz"
+    "publishd": "npm publish --dry-run",
+    "packd": "npm pack --dry-run"
   },
   "imports": {
     "#package_json": "./package.json"
   },
   "dependencies": {
-    "typescript": "^5.3.3"
+    "typescript": "^5.8.2"
   },
   "devDependencies": {
-    "@types/node": "^20.11.19",
+    "@types/node": "^22.13.10",
     "shx": "^0.3.4"
   }
 }

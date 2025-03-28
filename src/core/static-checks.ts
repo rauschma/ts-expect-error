@@ -64,7 +64,7 @@ function handleTsExpectError(parts: Array<string>, sourceFile: ts.SourceFile, no
     });
     return ProcessingStatus.FoundMatch;
   }
-  const actual = new ActualMessageAndCode(diagnostics[0]);
+  const actual = new ActualMessageAndCode(diagnostics[0]!);
 
   const checkPassed = expected.matchesActual(actual);
   statusLogger.logStaticCheck({

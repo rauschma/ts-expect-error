@@ -7,7 +7,6 @@ import type { ParseArgsConfig } from 'node:util';
 import * as util from 'node:util';
 import ts from 'typescript';
 import { performStaticChecks } from './core/static-checks.js';
-//@ts-expect-error: Module '#package_json' has no default export.
 import pkg from '#package_json' with { type: "json" };
 
 const BIN_NAME = 'ts-expect-error';
@@ -67,13 +66,17 @@ function main() {
     options = parseResult.options;
   } else {
     options = {
-      noEmit: true,
-      lib: ['es2022'],
-      module: ts.ModuleKind.NodeNext,
-      moduleResolution: ts.ModuleResolutionKind.NodeNext,
-      strict: true,
-      noImplicitOverride: true,
-      noImplicitReturns: true,
+      "noEmit": true,
+      "module": ts.ModuleKind.NodeNext,
+      "target": ts.ScriptTarget.ESNext,
+      "resolveJsonModule": true,
+      "strict": true,
+      "exactOptionalPropertyTypes": true,
+      "noFallthroughCasesInSwitch": true,
+      "noImplicitOverride": true,
+      "noImplicitReturns": true,
+      "noPropertyAccessFromIndexSignature": true,
+      "noUncheckedIndexedAccess": true,
     };
   }
 

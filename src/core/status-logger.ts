@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import ts, { flattenDiagnosticMessageText } from 'typescript';
 import type { FileDiagnosticLookup } from '../support/diagnostic-lookup.js';
 import { RE_TS_EXPECT_ERROR_PREFIX_G } from '../support/extract-comment-text.js';
 import { assertNonNullable } from '../util/type.js';
@@ -70,7 +70,13 @@ export class NormalStatusLogger implements StatusLogger {
 
     if (this.reportErrors) {
       for (const diagnosticInfo of Array.from(fileDiagnosticLookup.lineNumberToDiagnostics.values()).flat()) {
-        console.log(`• LINE ${diagnosticInfo.lineNumber + 1}: ${diagnosticInfo.messageText} (${diagnosticInfo.code})`);
+        // First line has indent 0, later lines are indented in two-space
+        // increments.
+        const messageText = flattenDiagnosticMessageText(
+          diagnosticInfo.messageText,
+          '\n', // newLine
+        );
+        console.log(`• LINE ${diagnosticInfo.lineNumber + 1}: ${messageText}`);
       }
     }
 
