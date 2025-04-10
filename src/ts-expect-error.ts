@@ -55,15 +55,18 @@ function main() {
 
   const tsconfigPath = args.values.tsconfig;
   if (tsconfigPath) {
-    const projectPath = path.dirname(tsconfigPath);
-    const sourceText = fs.readFileSync(tsconfigPath, 'utf-8');
-    const jsonOptions = ts.parseJsonText(tsconfigPath, sourceText);
-    const parseResult = ts.convertCompilerOptionsFromJson(jsonOptions, projectPath, tsconfigPath);
-    if (parseResult.errors.length > 0) {
-      console.log(parseResult.errors);
+    // Source: https://stackoverflow.com/questions/53804566/how-to-get-compileroptions-from-tsconfig-json
+    const configFile = ts.readConfigFile(tsconfigPath, ts.sys.readFile);
+    const parsed = ts.parseJsonConfigFileContent(
+      configFile.config,
+      ts.sys,
+      './'
+    );
+    if (parsed.errors.length > 0) {
+      console.log(parsed.errors);
       process.exit(1);
     }
-    options = parseResult.options;
+    options = parsed.options;
   } else {
     options = {
       "noEmit": true,
